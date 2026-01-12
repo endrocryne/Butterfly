@@ -112,6 +112,8 @@ sealed class CurrentIndex with _$CurrentIndex {
 }
 
 class CurrentIndexCubit extends Cubit<CurrentIndex> {
+  static final _fileSystemAccessService = FileSystemAccessService();
+  
   CurrentIndexCubit(
     SettingsCubit settingsCubit,
     TransformCubit transformCubit,
@@ -1734,8 +1736,7 @@ class CurrentIndexCubit extends Cubit<CurrentIndex> {
     if (!kIsWeb) return;
     
     try {
-      final service = FileSystemAccessService();
-      if (!service.hasDirectoryAccess()) {
+      if (!_fileSystemAccessService.hasDirectoryAccess()) {
         return;
       }
 
@@ -1747,7 +1748,7 @@ class CurrentIndexCubit extends Cubit<CurrentIndex> {
       final path = location.path;
       final fileName = path.startsWith('/') ? path.substring(1) : path;
       
-      await service.saveFile(fileName, bytes);
+      await _fileSystemAccessService.saveFile(fileName, bytes);
       talker.info('Saved to local folder: $fileName');
     } catch (e) {
       talker.error('Failed to save to local folder: $e');

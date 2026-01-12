@@ -14,7 +14,7 @@ class LocalFolderAccessDialog extends StatefulWidget {
 }
 
 class _LocalFolderAccessDialogState extends State<LocalFolderAccessDialog> {
-  final _service = FileSystemAccessService();
+  static final _service = FileSystemAccessService();
   bool _isLoading = false;
   String? _errorMessage;
 
