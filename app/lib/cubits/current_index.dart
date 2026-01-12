@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:butterfly/api/file_system_access.dart';
 import 'package:butterfly/api/image.dart';
 import 'package:butterfly/bloc/document_bloc.dart';
 import 'package:butterfly/cubits/settings.dart';
@@ -1706,6 +1707,12 @@ class CurrentIndexCubit extends Cubit<CurrentIndex> {
         ));
         await fileSystem.updateFile(current.path, file);
       }
+      
+      // Also save to local folder if File System Access API is enabled
+      if (kIsWeb && !absolute) {
+        await _saveToLocalFolder(current, currentData);
+      }
+      
       state.settingsCubit.addRecentHistory(current);
       emit(
         state.copyWith(
@@ -1717,6 +1724,34 @@ class CurrentIndexCubit extends Cubit<CurrentIndex> {
       );
       return current;
     });
+  }
+
+  /// Save a document to the local folder using File System Access API
+  Future<void> _saveToLocalFolder(
+    AssetLocation location,
+    NoteData data,
+  ) async {
+    if (!kIsWeb) return;
+    
+    try {
+      final service = FileSystemAccessService();
+      if (!service.hasDirectoryAccess()) {
+        return;
+      }
+
+      final isTextBased = location.fileType == AssetFileType.textNote;
+      final file = await compute(_toFile, (data, isTextBased));
+      final bytes = file.data;
+      
+      // Use the location path as the relative path in the local folder
+      final path = location.path;
+      final fileName = path.startsWith('/') ? path.substring(1) : path;
+      
+      await service.saveFile(fileName, bytes);
+      talker.info('Saved to local folder: $fileName');
+    } catch (e) {
+      talker.error('Failed to save to local folder: $e');
+    }
   }
 
   @override

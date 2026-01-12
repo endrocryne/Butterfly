@@ -1,12 +1,15 @@
 import 'package:butterfly/api/file_system.dart';
+import 'package:butterfly/api/file_system_access.dart';
 import 'package:butterfly/api/intent.dart';
 import 'package:butterfly/dialogs/collaboration/connect.dart';
 import 'package:butterfly/dialogs/file_system/move.dart';
+import 'package:butterfly/dialogs/local_folder_access.dart';
 import 'package:butterfly/models/defaults.dart';
 import 'package:butterfly/views/files/entity.dart';
 import 'package:butterfly/views/files/recent.dart';
 import 'package:butterfly/widgets/connection_button.dart';
 import 'package:butterfly_api/butterfly_api.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:butterfly/src/generated/i18n/app_localizations.dart';
@@ -148,6 +151,35 @@ class FilesViewState extends State<FilesView> {
     widget.onRemoteChanged?.call(remote);
   }
 
+  Widget _buildLocalFolderButton() {
+    final service = FileSystemAccessService();
+    if (!service.isSupported()) {
+      return const SizedBox.shrink();
+    }
+
+    final hasAccess = service.hasDirectoryAccess();
+    final directoryName = service.getDirectoryName();
+
+    return Tooltip(
+      message: hasAccess && directoryName != null
+          ? '${AppLocalizations.of(context).connectedTo} $directoryName'
+          : AppLocalizations.of(context).localFolder,
+      child: IconButton(
+        icon: PhosphorIcon(
+          hasAccess
+              ? PhosphorIconsFill.folderOpen
+              : PhosphorIconsLight.folder,
+        ),
+        onPressed: () async {
+          final result = await showLocalFolderAccessDialog(context);
+          if (result == true && mounted) {
+            setState(() {});
+          }
+        },
+      ),
+    );
+  }
+
   void Function(bool) _updateSelection(String path) => (bool value) {
     setState(() {
       if (value) {
@@ -241,6 +273,10 @@ class FilesViewState extends State<FilesView> {
                       state.connections.any((e) => e is RemoteStorage)
                           ? const SyncButton()
                           : const SizedBox.shrink(),
+                      if (kIsWeb && _remote == null) ...[
+                        const SizedBox(width: 2),
+                        _buildLocalFolderButton(),
+                      ],
                     ],
                   ),
                 ),
