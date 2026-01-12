@@ -1277,5 +1277,18 @@
   "redLinedRuledDark": "Red lined ruled dark",
   "redLinedQuad": "Red lined quad",
   "redLinedQuadDark": "Red lined quad dark",
-  "noItemSelected": "No item selected"
+  "noItemSelected": "No item selected",
+  "localFolder": "Local Folder",
+  "@localFolder": {
+    "description": "Local folder access for web"
+  },
+  "localFolderDescription": "Enable local folder access to save your notes directly to a folder on your device. This feature uses the File System Access API and is supported on modern browsers like Chrome, Edge, and Opera.",
+  "@localFolderDescription": {
+    "description": "Description of the local folder access feature"
+  },
+  "connectedTo": "Connected to:",
+  "disconnect": "Disconnect",
+  "changeFolder": "Change folder",
+  "selectFolder": "Select folder",
+  "folderAccessDenied": "Folder access was denied. Please try again and grant permission to access the folder."
 }
