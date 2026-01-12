@@ -55,6 +55,7 @@ class FilesViewState extends State<FilesView> {
   late DocumentFileSystem _documentSystem;
   late TemplateFileSystem _templateSystem;
   final GlobalKey<RecentFilesViewState> _recentFilesKey = GlobalKey();
+  late final FileSystemAccessService _fileSystemAccessService;
 
   SortBy _sortBy = SortBy.name;
   SortOrder _sortOrder = SortOrder.ascending;
@@ -69,6 +70,7 @@ class FilesViewState extends State<FilesView> {
     super.initState();
     _fileSystem = context.read<ButterflyFileSystem>();
     _settingsCubit = context.read<SettingsCubit>();
+    _fileSystemAccessService = FileSystemAccessService();
     _sortBy = _settingsCubit.state.sortBy;
     _sortOrder = _settingsCubit.state.sortOrder;
     _remote = widget.remote ?? _settingsCubit.getRemote();
@@ -152,13 +154,12 @@ class FilesViewState extends State<FilesView> {
   }
 
   Widget _buildLocalFolderButton() {
-    final service = FileSystemAccessService();
-    if (!service.isSupported()) {
+    if (!_fileSystemAccessService.isSupported()) {
       return const SizedBox.shrink();
     }
 
-    final hasAccess = service.hasDirectoryAccess();
-    final directoryName = service.getDirectoryName();
+    final hasAccess = _fileSystemAccessService.hasDirectoryAccess();
+    final directoryName = _fileSystemAccessService.getDirectoryName();
 
     return Tooltip(
       message: hasAccess && directoryName != null

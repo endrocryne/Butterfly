@@ -6,15 +6,21 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:web/web.dart' as web;
 
+/// Check if a JS value is null or undefined
+bool _isNullOrUndefined(JSAny? value) {
+  return value == null;
+}
+
 /// Get the File System Access API instance
 JSObject? get _fileSystemAccess {
   if (!kIsWeb) return null;
   try {
     final jsObject = web.window.getProperty('fileSystemAccess'.toJS);
-    if (jsObject.isNull || jsObject.isUndefined) {
+    // Check if the property exists and is not null/undefined
+    if (jsObject == null) {
       return null;
     }
-    return jsObject as JSObject;
+    return jsObject as JSObject?;
   } catch (e) {
     debugPrint('Error accessing fileSystemAccess: $e');
     return null;
@@ -39,7 +45,7 @@ class FileSystemAccessService {
     if (api == null) return false;
     try {
       final result = api.callMethod('isFileSystemAccessSupported'.toJS);
-      if (result.isNull || result.isUndefined) return false;
+      if (_isNullOrUndefined(result)) return false;
       return (result as JSBoolean).toDart;
     } catch (e) {
       debugPrint('Error checking File System Access API support: $e');
@@ -57,7 +63,7 @@ class FileSystemAccessService {
     try {
       final promise = api.callMethod('requestDirectoryAccess'.toJS) as JSPromise;
       final result = await promise.toDart;
-      if (result.isNull || result.isUndefined) return false;
+      if (_isNullOrUndefined(result)) return false;
       return (result as JSBoolean).toDart;
     } catch (e) {
       debugPrint('Error requesting directory access: $e');
@@ -72,7 +78,7 @@ class FileSystemAccessService {
     if (api == null) return false;
     try {
       final result = api.callMethod('hasDirectoryAccess'.toJS);
-      if (result.isNull || result.isUndefined) return false;
+      if (_isNullOrUndefined(result)) return false;
       return (result as JSBoolean).toDart;
     } catch (e) {
       debugPrint('Error checking directory access: $e');
@@ -87,7 +93,7 @@ class FileSystemAccessService {
     if (api == null) return null;
     try {
       final result = api.callMethod('getDirectoryName'.toJS);
-      if (result.isNull || result.isUndefined) return null;
+      if (_isNullOrUndefined(result)) return null;
       return (result as JSString).toDart;
     } catch (e) {
       debugPrint('Error getting directory name: $e');
@@ -108,7 +114,7 @@ class FileSystemAccessService {
       final jsData = data.toJS;
       final promise = api.callMethod('saveFile'.toJS, path.toJS, jsData) as JSPromise;
       final result = await promise.toDart;
-      if (result.isNull || result.isUndefined) return false;
+      if (_isNullOrUndefined(result)) return false;
       return (result as JSBoolean).toDart;
     } catch (e) {
       debugPrint('Error saving file: $e');
@@ -126,7 +132,7 @@ class FileSystemAccessService {
     try {
       final promise = api.callMethod('readFile'.toJS, path.toJS) as JSPromise;
       final result = await promise.toDart;
-      if (result.isNull || result.isUndefined) {
+      if (_isNullOrUndefined(result)) {
         return null;
       }
       final jsArray = result as JSUint8Array;
@@ -147,7 +153,7 @@ class FileSystemAccessService {
     try {
       final promise = api.callMethod('listDirectory'.toJS, path.toJS) as JSPromise;
       final result = await promise.toDart;
-      if (result.isNull || result.isUndefined) return [];
+      if (_isNullOrUndefined(result)) return [];
       
       final jsArray = result as JSArray;
       final entries = <FileSystemEntry>[];
@@ -155,14 +161,13 @@ class FileSystemAccessService {
       final length = jsArray.length;
       for (var i = 0; i < length; i++) {
         final entry = jsArray[i];
-        if (entry.isNull || entry.isUndefined) continue;
+        if (_isNullOrUndefined(entry)) continue;
         
         final jsEntry = entry as JSObject;
         final name = jsEntry.getProperty('name'.toJS);
         final isDirectory = jsEntry.getProperty('isDirectory'.toJS);
         
-        if (!name.isNull && !name.isUndefined &&
-            !isDirectory.isNull && !isDirectory.isUndefined) {
+        if (!_isNullOrUndefined(name) && !_isNullOrUndefined(isDirectory)) {
           entries.add(FileSystemEntry(
             name: (name as JSString).toDart,
             isDirectory: (isDirectory as JSBoolean).toDart,
@@ -187,7 +192,7 @@ class FileSystemAccessService {
     try {
       final promise = api.callMethod('deleteFile'.toJS, path.toJS) as JSPromise;
       final result = await promise.toDart;
-      if (result.isNull || result.isUndefined) return false;
+      if (_isNullOrUndefined(result)) return false;
       return (result as JSBoolean).toDart;
     } catch (e) {
       debugPrint('Error deleting file: $e');
