@@ -51,6 +51,17 @@ Try it [now](http://butterfly.linwood.dev/downloads)!
 
 ---
 
+## Quick Start
+
+Want to compile and deploy the web app? Check out our comprehensive [Quick Start Guide](QUICKSTART.md) for detailed instructions on:
+- 🚀 Setting up your development environment
+- 🔨 Compiling the web application
+- 🐳 Deploying with Docker
+- 🌐 Manual deployment to web servers
+- 🔍 Troubleshooting common issues
+
+---
+
 ## Contributing
 
 We are happy to see that you are interested in contributing to Butterfly.
