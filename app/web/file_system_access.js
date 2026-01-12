@@ -89,7 +89,7 @@ async function saveFile(path, data) {
 
     return true;
   } catch (error) {
-    console.error('Error saving file:', error);
+    console.error(`Error saving file "${path}":`, error);
     return false;
   }
 }

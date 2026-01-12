@@ -20,7 +20,7 @@ JSObject? get _fileSystemAccess {
     if (jsObject == null) {
       return null;
     }
-    return jsObject as JSObject?;
+    return jsObject as JSObject;
   } catch (e) {
     debugPrint('Error accessing fileSystemAccess: $e');
     return null;
