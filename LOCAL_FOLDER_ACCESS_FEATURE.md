@@ -69,15 +69,99 @@ Not supported in:
 
 ## Testing
 
-To test this feature:
+### Manual Testing Steps
 
-1. Build the web app: `flutter build web`
-2. Serve the web app locally or deploy to a server
-3. Open in Chrome/Edge
-4. Create a note and save it
-5. Enable local folder access
-6. Make changes to the note and save again
-7. Verify the file appears in the selected folder on your device
+To test this feature manually:
+
+1. **Build the web app**
+   ```bash
+   cd app
+   flutter build web --release
+   ```
+
+2. **Serve the web app locally**
+   ```bash
+   # Using Python
+   cd build/web
+   python -m http.server 8000
+   
+   # Or using the Flutter development server
+   flutter run -d chrome
+   ```
+
+3. **Test the feature**
+   - Open the app in Chrome or Edge
+   - Navigate to the Files view (sidebar)
+   - Ensure "Local" is selected as the source in the dropdown
+   - Look for the folder icon button (should appear next to the sync button area)
+   - Click the folder icon
+   - In the dialog, click "Select folder"
+   - Choose a folder on your device (e.g., Documents/ButterflyNotes)
+   - Grant permission when prompted by the browser
+   - Dialog should show "Connected to: [folder name]"
+   - Click outside to close the dialog
+
+4. **Verify saving**
+   - Create a new note or edit an existing one
+   - Make some changes
+   - Save the note (Ctrl+S or auto-save)
+   - Check the selected folder on your device
+   - The .bfly file should appear in the folder
+
+5. **Test folder structure**
+   - Create notes in subdirectories within the app
+   - Verify the folder structure is preserved in the local folder
+
+6. **Test disconnection**
+   - Click the folder icon again
+   - Click "Disconnect"
+   - Verify the icon changes back to outlined folder
+   - Save a note - it should only save to IndexedDB, not the local folder
+
+### Expected Behaviors
+
+- ✅ Folder button only appears on web when Local source is selected
+- ✅ Button is hidden on unsupported browsers (Firefox, Safari)
+- ✅ Clicking button opens a dialog with clear instructions
+- ✅ Browser's native folder picker appears when selecting folder
+- ✅ Dialog shows connection status after folder selection
+- ✅ Files are saved to both IndexedDB and local folder
+- ✅ Folder structure is preserved (subdirectories are created)
+- ✅ Icon changes between outlined and filled states
+- ✅ Tooltip shows folder name when connected
+
+### Browser-Specific Testing
+
+**Chrome/Edge (Supported)**
+- All features should work
+- Native folder picker appears
+- Files save successfully to local folder
+
+**Firefox (Not Supported)**
+- Folder button should not appear
+- App functions normally with IndexedDB only
+
+**Safari (Not Supported)**
+- Folder button should not appear
+- App functions normally with IndexedDB only
+
+### Error Scenarios to Test
+
+1. **Permission Denied**
+   - Select folder but deny permission
+   - Should show error message in dialog
+   - Should not crash the app
+
+2. **Folder Deleted**
+   - Select a folder
+   - Delete the folder from file system
+   - Try to save
+   - Should log error but not crash
+
+3. **Permission Lost**
+   - Select a folder
+   - Browser session continues
+   - Permission might be re-requested on next save
 
 ## Future Enhancements
 
